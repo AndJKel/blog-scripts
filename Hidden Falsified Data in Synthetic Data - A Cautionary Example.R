@@ -1,4 +1,4 @@
-#Hidden Fabricated Data in Synthetic Data: A Cautionary Example
+#Hidden Falsified Data in Synthetic Data: A Cautionary Example
 #Andrew J. Kelly
 
 
@@ -36,30 +36,30 @@ post_data_df <- data.frame(post_values) #creates the dataframe for the post-data
 created_data_df <- cbind(pre_data_df, post_data_df) #combines the column from the pre-data and post-data dataframes
 created_data_df #reports the combined dataframe
 
-##--FABRICATING THE DATA--##################################################################################
+##--FALSIFYING THE DATA--##################################################################################
 
-#fabricating the post-data; only fabricating post-data as it would allow the hypothesis to become statistically significant 
-fab_post_values <- (post_values - 2.5) #subtracts 2.5 from each case in the pre-data
-fab_post_values #reports the fabricated pre-data
+#falsifying the post-data; only falsifying post-data as it would allow the hypothesis to become statistically significant 
+fal_post_values <- (post_values - 2.5) #subtracts 2.5 from each case in the pre-data
+fal_post_values #reports the falsified pre-data
 
-fab_post_data_df <- data.frame(fab_post_values) #creates the dataframe for the fabricated post-data
-fab_post_data_df
+fal_post_data_df <- data.frame(fal_post_values) #creates the dataframe for the falsified post-data
+fal_post_data_df
 
-fabricated_data_df <- cbind(pre_data_df, fab_post_data_df) #combines the column from the pre-data and fabricated post-data dataframes
-fabricated_data_df #reports the combined frabicated dataframe
+falsified_data_df <- cbind(pre_data_df, fal_post_data_df) #combines the column from the pre-data and falsified post-data dataframes
+falsified_data_df #reports the combined frabicated dataframe
 
 ##--SYNTHESIZING THE DATA--##################################################################################
 
 #creates synthetic data of frabricated data
-syn_data <- syn(fabricated_data_df, seed = 1590) #creates the synthetic data
+syn_data <- syn(falsified_data_df, seed = 1590) #creates the synthetic data
 
 #replications in synthetic data
-replicated_from_fabricated <- replicated.uniques(syn_data, fabricated_data_df) #checks for replicated values from fabricated dataframe in synthetic dataframe
-replicated_from_fabricated #reports any replications
+replicated_from_falsified <- replicated.uniques(syn_data, falsified_data_df) #checks for replicated values from falsified dataframe in synthetic dataframe
+replicated_from_falsified #reports any replications
 
 #creates an identifier that the synthetic data is not real
 syn_data_identification <- sdc(syn_data, #synthetic dataset
-                               fabricated_data_df, #original dataset
+                               falsified_data_df, #original dataset
                                label = "SYNTHETIC_DATA") #creates a column filled with "FAKE_DATE"
 
 #puts the data in a dataframe
@@ -81,56 +81,56 @@ created_data_d <- cohens_d(created_data_df$pre_values,
                            paired = TRUE)
 created_data_d #reports the effect size for the created data
 
-#paired t-test of pre-data and the fabricated post-data
-fabricated_data_t <- t.test(fabricated_data_df$pre_values,
-                            fabricated_data_df$fab_post_values,
+#paired t-test of pre-data and the falsified post-data
+falsified_data_t <- t.test(falsified_data_df$pre_values,
+                            falsified_data_df$fal_post_values,
                             paired = TRUE)
-fabricated_data_t #reports the outcome of the paired t-test
+falsified_data_t #reports the outcome of the paired t-test
 
-#effect size for the fabricated data
-fabricated_data_d <- cohens_d(fabricated_data_df$pre_values,
-                              fabricated_data_df$fab_post_values,
+#effect size for the falsified data
+falsified_data_d <- cohens_d(falsified_data_df$pre_values,
+                              falsified_data_df$fal_post_values,
                               paired = TRUE)
-fabricated_data_d #reports the effect size for the created data
+falsified_data_d #reports the effect size for the created data
 
 ##--GENERATING THE FIGURE--##################################################################################
 
 #creates a comparison figure for the original and synthetic datasets - SESBI intensity only
-fab_and_syn_comparison_fig <- compare(
+fal_and_syn_comparison_fig <- compare(
   syn_data, #synthetic data
-  fabricated_data_df, #original data
+  falsified_data_df, #original data
   vars = c("pre_values", 
-           "fab_post_values"),
+           "fal_post_values"),
   print.coef = TRUE, # Print tables of estimates for original and synthetic data
   ncol = 2, #number of columns in the plot; should equal the number of variables 
   breaks = 10, #gap between the columns
   stat = "counts", #the raw count of the variable
-  cols = c("#5f27cd", "#a29bfe")#the colors of the bars, first color is original data and second is synthetic
+  cols = c("#74b9ff", "#0984e3")#the colors of the bars, first color is original data and second is synthetic
 )
 
-fab_and_syn_comparison_fig <- fab_and_syn_comparison_fig$plots
+fal_and_syn_comparison_fig <- fal_and_syn_comparison_fig$plots
 
-fab_and_syn_comparison_fig <- fab_and_syn_comparison_fig +
+fal_and_syn_comparison_fig <- fal_and_syn_comparison_fig +
   scale_y_continuous(expand = c(0, 0)) + # Forces the y-axis to start at zero
   theme_minimal_hgrid(12) # Applies a theme from the 'cowplot' package
 
-fab_and_syn_comparison_fig <- fab_and_syn_comparison_fig +
+fal_and_syn_comparison_fig <- fal_and_syn_comparison_fig +
   theme(axis.text.x = element_text(angle = 90, hjust = 1),
         # Adjusts x-axis tick labels
         axis.title.x = element_blank()) + # Removes x-axis title
   labs(fill = "Dataset") #legend is named "Dataset"
 
-fab_and_syn_comparison_fig #reports the figure
+fal_and_syn_comparison_fig #reports the figure
 
 
 ##--TESTING THE SYNTHESIZED DATA--##################################################################################
 
 syn_data_t <- t.test(syn_data_df$pre_values,
-                     syn_data_df$fab_post_values,
+                     syn_data_df$fal_post_values,
                      paired = TRUE)
 syn_data_t
 
 syn_data_d <- cohens_d(syn_data_df$pre_values,
-                     syn_data_df$fab_post_values,
-                     paired = TRUE)
+                       syn_data_df$fal_post_values,
+                       paired = TRUE)
 syn_data_d
